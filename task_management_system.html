@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gerenciamento de Tarefas</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const TaskManagementSystem = () => {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [tasks, setTasks] = useState([
+                { 
+                    id: 1, 
+                    title: 'Implementar autenticação', 
+                    description: 'Adicionar sistema de login e registro',
+                    status: 'em-andamento', 
+                    priority: 'alta',
+                    project: 'Sistema Web',
+                    dueDate: '2025-08-15'
+                },
+                { 
+                    id: 2, 
+                    title: 'Design da interface', 
+                    description: 'Criar mockups das telas principais',
+                    status: 'concluida', 
+                    priority: 'media',
+                    project: 'Sistema Web',
+                    dueDate: '2025-08-10'
+                },
+                { 
+                    id: 3, 
+                    title: 'Configurar banco de dados', 
+                    description: 'Setup inicial do PostgreSQL',
+                    status: 'pendente', 
+                    priority: 'alta',
+                    project: 'Sistema Web',
+                    dueDate: '2025-08-20'
+                },
+                { 
+                    id: 4, 
+                    title: 'Testes unitários', 
+                    description: 'Implementar testes para componentes',
+                    status: 'pendente', 
+                    priority: 'baixa',
+                    project: 'App Mobile',
+                    dueDate: '2025-08-25'
+                }
+            ]);
+
+            const [projects, setProjects] = useState([
+                { 
+                    id: 1, 
+                    name: 'Sistema Web', 
+                    progress: 65, 
+                    tasks: 8, 
+                    completed: 5,
+                    deadline: '2025-09-01'
+                },
+                { 
+                    id: 2, 
+                    name: 'App Mobile', 
+                    progress: 30, 
+                    tasks: 12, 
+                    completed: 4,
+                    deadline: '2025-10-15'
+                },
+                { 
+                    id: 3, 
+                    name: 'API REST', 
+                    progress: 85, 
+                    tasks: 6, 
+                    completed: 5,
+                    deadline: '2025-08-30'
+                }
+            ]);
+
+            const [newTask, setNewTask] = useState({
+                title: '',
+                description: '',
+                priority: 'media',
+                project: 'Sistema Web',
+                dueDate: ''
+            });
+
+            const [editingTask, setEditingTask] = useState(null);
+            const [showTaskForm, setShowTaskForm] = useState(false);
+
+            const addTask = () => {
+                if (newTask.title.trim()) {
+                    const task = {
+                        id: Date.now(),
+                        ...newTask,
+                        status: 'pendente'
+                    };
+                    setTasks([...tasks, task]);
+                    setNewTask({
+                        title: '',
+                        description: '',
+                        priority: 'media',
+                        project: 'Sistema Web',
+                        dueDate: ''
+                    });
+                    setShowTaskForm(false);
+                }
+            };
+
+            const updateTask = (id, updates) => {
+                setTasks(tasks.map(task => 
+                    task.id === id ? { ...task, ...updates } : task
+                ));
+            };
+
+            const deleteTask = (id) => {
+                setTasks(tasks.filter(task => task.id !== id));
+            };
+
+            const editTask = (task) => {
+                setEditingTask(task);
+                setNewTask({
+                    title: task.title,
+                    description: task.description,
+                    priority: task.priority,
+                    project: task.project,
+                    dueDate: task.dueDate
+                });
+                setShowTaskForm(true);
+            };
+
+            const saveEdit = () => {
+                if (editingTask && newTask.title.trim()) {
+                    updateTask(editingTask.id, newTask);
+                    setEditingTask(null);
+                    setNewTask({
+                        title: '',
+                        description: '',
+                        priority: 'media',
+                        project: 'Sistema Web',
+                        dueDate: ''
+                    });
+                    setShowTaskForm(false);
+                }
+            };
+
+            const cancelEdit = () => {
+                setEditingTask(null);
+                setNewTask({
+                    title: '',
+                    description: '',
+                    priority: 'media',
+                    project: 'Sistema Web',
+                    dueDate: ''
+                });
+                setShowTaskForm(false);
+            };
+
+            const getStatusColor = (status) => {
+                switch (status) {
+                    case 'pendente': return 'bg-yellow-100 text-yellow-800';
+                    case 'em-andamento': return 'bg-blue-100 text-blue-800';
+                    case 'concluida': return 'bg-green-100 text-green-800';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            };
+
+            const getPriorityColor = (priority) => {
+                switch (priority) {
+                    case 'alta': return 'bg-red-100 text-red-800';
+                    case 'media': return 'bg-yellow-100 text-yellow-800';
+                    case 'baixa': return 'bg-green-100 text-green-800';
+                    default: return 'bg-gray-100 text-gray-800';
+                }
+            };
+
+            const getStats = () => {
+                const total = tasks.length;
+                const completed = tasks.filter(t => t.status === 'concluida').length;
+                const inProgress = tasks.filter(t => t.status === 'em-andamento').length;
+                const pending = tasks.filter(t => t.status === 'pendente').length;
+                
+                return { total, completed, inProgress, pending };
+            };
+
+            const stats = getStats();
+
+            const renderDashboard = () => {
+                return (
+                    <div className="space-y-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
+                        
+                        {/* Estatísticas */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
+                                <div className="flex items-center">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Total de Tarefas</p>
+                                        <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                                    </div>
+                                    <div className="ml-auto">
+                                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                            <span className="text-blue-600 font-bold">📊</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                                <div className="flex items-center">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Concluídas</p>
+                                        <p className="text-2xl font-bold text-gray-900">{stats.completed}</p>
+                                    </div>
+                                    <div className="ml-auto">
+                                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                                            <span className="text-green-600 font-bold">✅</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-yellow-500">
+                                <div className="flex items-center">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Em Andamento</p>
+                                        <p className="text-2xl font-bold text-gray-900">{stats.inProgress}</p>
+                                    </div>
+                                    <div className="ml-auto">
+                                        <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                            <span className="text-yellow-600 font-bold">⏳</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500">
+                                <div className="flex items-center">
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-600">Pendentes</p>
+                                        <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
+                                    </div>
+                                    <div className="ml-auto">
+                                        <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                            <span className="text-red-600 font-bold">⏰</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Gráfico de Progresso */}
+                        <div className="bg-white p-6 rounded-lg shadow-md">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Progresso Geral</h3>
+                            <div className="space-y-4">
+                                <div className="flex justify-between text-sm text-gray-600">
+                                    <span>Conclusão das Tarefas</span>
+                                    <span>{Math.round((stats.completed / stats.total) * 100)}%</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                    <div 
+                                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                        style={{ width: `${(stats.completed / stats.total) * 100}%` }}
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Tarefas Recentes */}
+                        <div className="bg-white p-6 rounded-lg shadow-md">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tarefas Recentes</h3>
+                            <div className="space-y-3">
+                                {tasks.slice(0, 3).map(task => (
+                                    <div key={task.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-md">
+                                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                                            {task.status}
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-sm font-medium text-gray-900">{task.title}</p>
+                                            <p className="text-xs text-gray-500">{task.project}</p>
+                                        </div>
+                                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                                            {task.priority}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderTasks = () => {
+                return (
+                    <div className="space-y-6">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-2xl font-bold text-gray-900">Gerenciamento de Tarefas</h2>
+                            <button
+                                onClick={() => setShowTaskForm(true)}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                            >
+                                + Nova Tarefa
+                            </button>
+                        </div>
+
+                        {/* Formulário de Tarefa */}
+                        {showTaskForm && (
+                            <div className="bg-white p-6 rounded-lg shadow-md">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                                    {editingTask ? 'Editar Tarefa' : 'Nova Tarefa'}
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Título
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={newTask.title}
+                                            onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Digite o título da tarefa"
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Prioridade
+                                        </label>
+                                        <select
+                                            value={newTask.priority}
+                                            onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="baixa">Baixa</option>
+                                            <option value="media">Média</option>
+                                            <option value="alta">Alta</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Projeto
+                                        </label>
+                                        <select
+                                            value={newTask.project}
+                                            onChange={(e) => setNewTask({ ...newTask, project: e.target.value })}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            {projects.map(project => (
+                                                <option key={project.id} value={project.name}>
+                                                    {project.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Data de Vencimento
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={newTask.dueDate}
+                                            onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Descrição
+                                        </label>
+                                        <textarea
+                                            value={newTask.description}
+                                            onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                                            rows="3"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Descreva a tarefa"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex space-x-3 mt-4">
+                                    <button
+                                        onClick={editingTask ? saveEdit : addTask}
+                                        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+                                    >
+                                        {editingTask ? 'Salvar Alterações' : 'Adicionar Tarefa'}
+                                    </button>
+                                    <button
+                                        onClick={cancelEdit}
+                                        className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors"
+                                    >
+                                        Cancelar
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Lista de Tarefas */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {tasks.map(task => (
+                                <div key={task.id} className="bg-white p-6 rounded-lg shadow-md">
+                                    <div className="flex justify-between items-start mb-3">
+                                        <h3 className="text-lg font-semibold text-gray-900">{task.title}</h3>
+                                        <div className="flex space-x-2">
+                                            <button
+                                                onClick={() => editTask(task)}
+                                                className="text-blue-600 hover:text-blue-800 text-sm"
+                                            >
+                                                ✏️
+                                            </button>
+                                            <button
+                                                onClick={() => deleteTask(task.id)}
+                                                className="text-red-600 hover:text-red-800 text-sm"
+                                            >
+                                                🗑️
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <p className="text-gray-600 text-sm mb-3">{task.description}</p>
+                                    
+                                    <div className="flex flex-wrap gap-2 mb-3">
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
+                                            {task.status}
+                                        </span>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(task.priority)}`}>
+                                            {task.priority}
+                                        </span>
+                                        <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                                            {task.project}
+                                        </span>
+                                    </div>
+
+                                    {task.dueDate && (
+                                        <p className="text-sm text-gray-500 mb-3">
+                                            Vencimento: {new Date(task.dueDate).toLocaleDateString('pt-BR')}
+                                        </p>
+                                    )}
+
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={() => updateTask(task.id, { status: 'pendente' })}
+                                            className={`px-3 py-1 rounded text-xs transition-colors ${
+                                                task.status === 'pendente' 
+                                                    ? 'bg-yellow-200 text-yellow-800' 
+                                                    : 'bg-gray-200 text-gray-600 hover:bg-yellow-200'
+                                            }`}
+                                        >
+                                            Pendente
+                                        </button>
+                                        <button
+                                            onClick={() => updateTask(task.id, { status: 'em-andamento' })}
+                                            className={`px-3 py-1 rounded text-xs transition-colors ${
+                                                task.status === 'em-andamento' 
+                                                    ? 'bg-blue-200 text-blue-800' 
+                                                    : 'bg-gray-200 text-gray-600 hover:bg-blue-200'
+                                            }`}
+                                        >
+                                            Em Andamento
+                                        </button>
+                                        <button
+                                            onClick={() => updateTask(task.id, { status: 'concluida' })}
+                                            className={`px-3 py-1 rounded text-xs transition-colors ${
+                                                task.status === 'concluida' 
+                                                    ? 'bg-green-200 text-green-800' 
+                                                    : 'bg-gray-200 text-gray-600 hover:bg-green-200'
+                                            }`}
+                                        >
+                                            Concluída
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderProjects = () => {
+                return (
+                    <div className="space-y-6">
+                        <h2 className="text-2xl font-bold text-gray-900">Projetos</h2>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {projects.map(project => (
+                                <div key={project.id} className="bg-white p-6 rounded-lg shadow-md">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-3">{project.name}</h3>
+                                    
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-600">Progresso</span>
+                                            <span className="font-medium text-gray-900">{project.progress}%</span>
+                                        </div>
+                                        
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div 
+                                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                                style={{ width: `${project.progress}%` }}
+                                            ></div>
+                                        </div>
+
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-600">Tarefas</span>
+                                            <span className="font-medium text-gray-900">
+                                                {project.completed} / {project.tasks}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex justify-between text-sm">
+                                            <span className="text-gray-600">Prazo</span>
+                                            <span className="font-medium text-gray-900">
+                                                {new Date(project.deadline).toLocaleDateString('pt-BR')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <button className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                                        Ver Detalhes
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            };
+
+            return (
+                <div className="min-h-screen bg-gray-100">
+                    {/* Header */}
+                    <header className="bg-white shadow-md">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between items-center py-4">
+                                <div className="flex items-center space-x-4">
+                                    <h1 className="text-xl font-bold text-gray-900">TaskManager Pro</h1>
+                                    <span className="text-sm text-gray-500">Sistema de Gerenciamento de Tarefas</span>
+                                </div>
+                                <div className="flex items-center space-x-4">
+                                    <div className="text-sm text-gray-600">
+                                        {new Date().toLocaleDateString('pt-BR', { 
+                                            weekday: 'long', 
+                                            year: 'numeric', 
+                                            month: 'long', 
+                                            day: 'numeric' 
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Navigation */}
+                    <nav className="bg-white border-b border-gray-200">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex space-x-8">
+                                <button
+                                    onClick={() => setActiveTab('dashboard')}
+                                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                        activeTab === 'dashboard'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    📊 Dashboard
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('tasks')}
+                                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                        activeTab === 'tasks'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    📋 Tarefas
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('projects')}
+                                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                        activeTab === 'projects'
+                                            ? 'border-blue-500 text-blue-600'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    }`}
+                                >
+                                    📁 Projetos
+                                </button>
+                            </div>
+                        </div>
+                    </nav>
+
+                    {/* Main Content */}
+                    <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                        {(() => {
+                            switch (activeTab) {
+                                case 'dashboard':
+                                    return renderDashboard();
+                                case 'tasks':
+                                    return renderTasks();
+                                case 'projects':
+                                    return renderProjects();
+                                default:
+                                    return renderDashboard();
+                            }
+                        })()}
+                    </main>
+
+                    {/* Footer */}
+                    <footer className="bg-white border-t border-gray-200 mt-12">
+                        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+                            <div className="text-center text-sm text-gray-500">
+                                © 2025 TaskManager Pro - Sistema de Gerenciamento de Tarefas
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<TaskManagementSystem />, document.getElementById('root'));
+    </script>
+</body>
+</html>
