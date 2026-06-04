@@ -1,0 +1,58 @@
+[
+    {
+        "title": "Finish project report",
+        "description": "Complete the final report for the project due tomorrow.",
+        "urgency": "high",
+        "importance": "high",
+        "necessity": "high"
+    },
+    {
+        "title": "Grocery shopping",
+        "description": "Buy groceries for the week.",
+        "urgency": "medium",
+        "importance": "medium",
+        "necessity": "high"
+    },
+    {
+        "title": "Schedule dentist appointment",
+        "description": "Call to schedule a check-up appointment.",
+        "urgency": "low",
+        "importance": "medium",
+        "necessity": "medium"
+    },
+    {
+        "title": "Prepare presentation for Monday",
+        "description": "Create slides for the upcoming presentation.",
+        "urgency": "high",
+        "importance": "high",
+        "necessity": "medium"
+    },
+    {
+        "title": "Read a book",
+        "description": "Finish reading the current book.",
+        "urgency": "low",
+        "importance": "low",
+        "necessity": "low"
+    },
+    {
+        "title": "Workout",
+        "description": "Go to the gym for a workout session.",
+        "urgency": "medium",
+        "importance": "medium",
+        "necessity": "medium"
+    },
+    {
+        "title": "Pay utility bills",
+        "description": "Ensure all utility bills are paid by the end of the week.",
+        "urgency": "high",
+        "importance": "high",
+        "necessity": "high"
+    },
+    {
+        "title": "Clean the house",
+        "description": "Do a thorough cleaning of the house.",
+        "urgency": "medium",
+        "importance": "low",
+        "necessity": "medium"
+    }
+]

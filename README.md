@@ -1,29 +1,51 @@
-# gerenciador-tarefas
-Gerenciador de Tarefas - Task Management PRO
- Como usar o projeto em sua máquina:
-Método 1: Arquivo HTML Simples
+# Gerenciador de Tarefas
 
-Copie o código do artifact acima
-Cole em um arquivo e salve como task-manager.html
-Abra no navegador - funciona offline!
+**Gerenciador de Tarefas — Task Management PRO**
 
-Método 2: Estrutura de Projeto Completa
-Se você quiser uma estrutura mais organizada, crie os seguintes arquivos:
-📁 Estrutura sugerida:
-task-manager/
-├── index.html
-├── styles.css (opcional - já incluso no HTML)
-├── script.js (opcional - já incluso no HTML)
-└── README.md
-Método 3: Servidor Local (opcional)
-Para desenvolvimento mais avançado:
-bash# Se tiver Python instalado
-python -m http.server 3000
+- **Idioma:** Português (pt-BR)
+- **Codificação:** UTF-8
 
-# Se tiver Node.js instalado
-npx serve .
+**Visão geral**
 
-# Ou use Live Server no VS Code
-🚀 Funcionalidades Incluídas:
-✅ Dashboard completo com estatísticas visuais
-✅ CRUD de tarefas -
+Projeto para gerar e organizar tarefas diárias por urgência, importância e necessidade. Inclui interface web simples, utilitários em JavaScript e componentes para alertas e exibição de tarefas.
+
+**Como usar localmente**
+
+1. Abra um terminal na pasta do projeto:
+
+   cd C:\Users\SeuUsuario.moraes\Documents\Jhonny\Aprendizado-Projetos\gerenciador-tarefas
+
+2. Instale dependências (se aplicável):
+
+```powershell
+npm install
+```
+
+3. Inicie o servidor local para visualizar a interface (ex.: pasta `daily-task-generator`):
+
+```powershell
+cd daily-task-generator
+npm start
+# ou use um servidor estático:
+# npx serve .
+```
+
+**Estrutura sugerida**
+
+- `daily-task-generator/`
+  - `public/` — HTML, CSS, scripts e ativos
+  - `src/` — componentes, utilitários e dados de exemplo
+  - `tests/` — testes automatizados
+
+**Recursos e observações**
+
+- Urgências padronizadas: `low`, `medium`, `high`.
+- Utilitários: `src/utils/priorityUtils.js`, `src/utils/taskGenerator.js`.
+- Componentes visuais: `src/components/alerts.js`, `src/components/taskCard.js`.
+- Dados de amostra: `src/data/sample-tasks.json`.
+- Interface principal: `daily-task-generator/public/index.html`.
+
+**Contribuição**
+
+Sinta-se à vontade para enviar issues e pull requests com melhorias de design, acessibilidade e internacionalização.
+ 
