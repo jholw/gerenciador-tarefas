@@ -1,0 +1,32 @@
+{
+  "name": "daily-task-generator",
+  "version": "1.0.0",
+  "description": "A daily task generator application that organizes tasks by urgency, importance, and necessity.",
+  "main": "public/scripts/main.js",
+  "scripts": {
+    "start": "live-server public",
+    "test": "jest"
+  },
+  "keywords": [
+    "task",
+    "generator",
+    "management",
+    "urgency",
+    "importance"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "live-server": "^1.2.1",
+    "jest": "^27.0.6"
+  },
+  "devDependencies": {},
+  "homepage": "https://github.com/yourusername/daily-task-generator",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/daily-task-generator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/daily-task-generator/issues"
+  }
+}

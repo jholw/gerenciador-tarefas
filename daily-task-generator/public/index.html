@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Tarefas Diárias</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div id="app" class="container">
+        <header class="app-header">
+            <div class="brand">
+                <h1>Gerador de Tarefas</h1>
+                <span class="tag">Quadro Kanban por prioridade com tarefas concluídas</span>
+            </div>
+        </header>
+        <main>
+            <section class="panel" id="task-input">
+                <h2>Adicionar nova tarefa</h2>
+                <input type="text" id="task-title" placeholder="Título da tarefa" required>
+                <textarea id="task-description" placeholder="Descrição (opcional)"></textarea>
+                <div class="controls">
+                    <select id="task-urgency" aria-label="Urgência">
+                        <option value="high">Alta</option>
+                        <option value="medium">Média</option>
+                        <option value="low">Baixa</option>
+                    </select>
+                    <select id="task-importance" aria-label="Importância">
+                        <option value="high">Alta</option>
+                        <option value="medium">Média</option>
+                        <option value="low">Baixa</option>
+                    </select>
+                    <button id="add-task-btn" class="btn-primary">Adicionar</button>
+                </div>
+            </section>
+            <section class="board-panel">
+                <div class="board-header">
+                    <h2>Quadro Kanban de prioridades</h2>
+                    <p>Arraste sua rotina para alta, média ou baixa prioridade e marque como concluída.</p>
+                </div>
+                <div class="board-grid">
+                    <article class="column high-column">
+                        <div class="column-header">
+                            <h3>Alta</h3>
+                            <span>Prioridade alta</span>
+                        </div>
+                        <div id="high-column" class="column-body"></div>
+                    </article>
+                    <article class="column medium-column">
+                        <div class="column-header">
+                            <h3>Média</h3>
+                            <span>Prioridade média</span>
+                        </div>
+                        <div id="medium-column" class="column-body"></div>
+                    </article>
+                    <article class="column low-column">
+                        <div class="column-header">
+                            <h3>Baixa</h3>
+                            <span>Prioridade baixa</span>
+                        </div>
+                        <div id="low-column" class="column-body"></div>
+                    </article>
+                </div>
+            </section>
+            <section class="panel completed-panel" id="completed-panel">
+                <div class="column-header">
+                    <h2>Concluídas</h2>
+                    <span>Tarefas finalizadas recentemente</span>
+                </div>
+                <div id="completed-tasks" class="column-body"></div>
+            </section>
+        </main>
+    </div>
+    <script src="scripts/main.js"></script>
+</body>
+</html>
