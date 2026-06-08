@@ -1,3 +1,5 @@
+// Este módulo gera tarefas de exemplo para fins de teste ou demonstração.
+// Ele cria tarefas com atributos variados de urgência, importância e necessidade.
 const urgencyLevels = ['low', 'medium', 'high'];
 const importanceLevels = ['low', 'medium', 'high'];
 
@@ -20,3 +22,4 @@ function generateTasks(count = 5) {
 }
 
 module.exports = { generateTasks };
+

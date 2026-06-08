@@ -1,13 +1,17 @@
 <!DOCTYPE html>
+<!-- Página principal do Gerador de Tarefas Diárias. -->
 <html lang="pt-BR">
 <head>
+    <!-- Metadados para codificação de caracteres e layout responsivo. -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gerador de Tarefas Diárias</title>
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
+    <!-- Container principal que envolve toda a aplicação. -->
     <div id="app" class="container">
+        <!-- Cabeçalho com o título da aplicação e descrição. -->
         <header class="app-header">
             <div class="brand">
                 <h1>Gerador de Tarefas</h1>
@@ -15,10 +19,12 @@
             </div>
         </header>
         <main>
+            <!-- Seção de entrada de nova tarefa. -->
             <section class="panel" id="task-input">
                 <h2>Adicionar nova tarefa</h2>
                 <input type="text" id="task-title" placeholder="Título da tarefa" required>
                 <textarea id="task-description" placeholder="Descrição (opcional)"></textarea>
+                <!-- Controles para definir urgência, importância e adicionar a tarefa. -->
                 <div class="controls">
                     <select id="task-urgency" aria-label="Urgência">
                         <option value="high">Alta</option>
@@ -33,12 +39,14 @@
                     <button id="add-task-btn" class="btn-primary">Adicionar</button>
                 </div>
             </section>
+            <!-- Seção principal do quadro Kanban com as colunas de prioridade. -->
             <section class="board-panel">
                 <div class="board-header">
                     <h2>Quadro Kanban de prioridades</h2>
                     <p>Arraste sua rotina para alta, média ou baixa prioridade e marque como concluída.</p>
                 </div>
                 <div class="board-grid">
+                    <!-- Coluna de prioridade alta. -->
                     <article class="column high-column">
                         <div class="column-header">
                             <h3>Alta</h3>
@@ -46,6 +54,7 @@
                         </div>
                         <div id="high-column" class="column-body"></div>
                     </article>
+                    <!-- Coluna de prioridade média. -->
                     <article class="column medium-column">
                         <div class="column-header">
                             <h3>Média</h3>
@@ -53,6 +62,7 @@
                         </div>
                         <div id="medium-column" class="column-body"></div>
                     </article>
+                    <!-- Coluna de prioridade baixa. -->
                     <article class="column low-column">
                         <div class="column-header">
                             <h3>Baixa</h3>
@@ -62,6 +72,7 @@
                     </article>
                 </div>
             </section>
+            <!-- Seção de tarefas concluídas, exibindo o histórico recente. -->
             <section class="panel completed-panel" id="completed-panel">
                 <div class="column-header">
                     <h2>Concluídas</h2>
@@ -71,6 +82,7 @@
             </section>
         </main>
     </div>
+    <!-- Script principal que cria a lógica de tarefas, drag and drop e persistência. -->
     <script src="scripts/main.js"></script>
 </body>
 </html>
