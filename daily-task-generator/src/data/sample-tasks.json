@@ -1,5 +1,6 @@
 [
     {
+        "_comment": "Exemplo de tarefa com marcação de urgência, importância e necessidade.",
         "title": "Finish project report",
         "description": "Complete the final report for the project due tomorrow.",
         "urgency": "high",
@@ -7,6 +8,7 @@
         "necessity": "high"
     },
     {
+        "_comment": "Tarefa de compras com urgência média e importância média.",
         "title": "Grocery shopping",
         "description": "Buy groceries for the week.",
         "urgency": "medium",
@@ -14,6 +16,7 @@
         "necessity": "high"
     },
     {
+        "_comment": "Exemplo de tarefa de agendamento com urgência baixa.",
         "title": "Schedule dentist appointment",
         "description": "Call to schedule a check-up appointment.",
         "urgency": "low",
@@ -21,6 +24,7 @@
         "necessity": "medium"
     },
     {
+        "_comment": "Tarefa de preparação de apresentação com urgência alta.",
         "title": "Prepare presentation for Monday",
         "description": "Create slides for the upcoming presentation.",
         "urgency": "high",
@@ -28,6 +32,7 @@
         "necessity": "medium"
     },
     {
+        "_comment": "Exemplo de tarefa pessoal de leitura com baixa prioridade.",
         "title": "Read a book",
         "description": "Finish reading the current book.",
         "urgency": "low",
@@ -35,6 +40,7 @@
         "necessity": "low"
     },
     {
+        "_comment": "Exemplo de atividade física com urgência e importância médias.",
         "title": "Workout",
         "description": "Go to the gym for a workout session.",
         "urgency": "medium",
@@ -42,6 +48,7 @@
         "necessity": "medium"
     },
     {
+        "_comment": "Tarefa financeira urgente e importante de pagamento de contas.",
         "title": "Pay utility bills",
         "description": "Ensure all utility bills are paid by the end of the week.",
         "urgency": "high",
@@ -49,6 +56,7 @@
         "necessity": "high"
     },
     {
+        "_comment": "Exemplo de tarefa de limpeza com prioridade média.",
         "title": "Clean the house",
         "description": "Do a thorough cleaning of the house.",
         "urgency": "medium",

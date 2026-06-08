@@ -1,17 +1,20 @@
 ﻿// main.js
+// Este script controla o comportamento do gerenciador de tarefas todos os dias.
+// Ele cria tarefas, renderiza o quadro e suporta arrastar/soltar e salvar observações.
 const STORAGE_KEY = 'dailyTaskGeneratorState';
 const priorityLabels = { high: 'Alta', medium: 'Média', low: 'Baixa' };
 const state = { tasks: [], completed: [] };
-
 const dropZones = ['high-column', 'medium-column', 'low-column', 'completed-tasks'];
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Seleciona os elementos do formulário e botão de adicionar tarefa.
     const titleInput = document.getElementById('task-title');
     const descInput = document.getElementById('task-description');
     const urgencyInput = document.getElementById('task-urgency');
     const importanceInput = document.getElementById('task-importance');
     const addTaskButton = document.getElementById('add-task-btn');
 
+    // Ao clicar no botão ou pressionar Enter, cria uma nova tarefa.
     addTaskButton.addEventListener('click', () => handleAddTask(titleInput, descInput, urgencyInput, importanceInput));
     titleInput.addEventListener('keydown', event => {
         if (event.key === 'Enter') {
@@ -25,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderBoard();
 });
 
+// Cria uma nova tarefa a partir dos valores do formulário.
 function handleAddTask(titleInput, descInput, urgencyInput, importanceInput) {
     const title = titleInput.value.trim();
     const description = descInput.value.trim();
@@ -47,10 +51,11 @@ function handleAddTask(titleInput, descInput, urgencyInput, importanceInput) {
         createdAt: new Date().toISOString()
     };
 
-    state.tasks.unshift(task);
-    saveState();
-    renderBoard();
+    state.tasks.unshift(task); // Adiciona a tarefa no início da lista.
+    saveState(); // Salva o estado atual no armazenamento local.
+    renderBoard(); // Atualiza a exibição do quadro.
 
+    // Limpa o formulário e devolve o foco ao campo de título.
     titleInput.value = '';
     descInput.value = '';
     urgencyInput.value = 'high';
@@ -58,6 +63,7 @@ function handleAddTask(titleInput, descInput, urgencyInput, importanceInput) {
     titleInput.focus();
 }
 
+// Renderiza todas as colunas de tarefas e a área de concluídas.
 function renderBoard() {
     renderColumn('high');
     renderColumn('medium');
@@ -65,6 +71,7 @@ function renderBoard() {
     renderCompleted();
 }
 
+// Renderiza apenas as tarefas de uma prioridade específica.
 function renderColumn(priority) {
     const column = document.getElementById(`${priority}-column`);
     const filteredTasks = state.tasks.filter(task => task.urgency === priority && !task.completed);
@@ -81,6 +88,7 @@ function renderColumn(priority) {
     });
 }
 
+// Renderiza a lista de tarefas concluídas separadamente.
 function renderCompleted() {
     const completedColumn = document.getElementById('completed-tasks');
     const completedTasks = state.completed;
@@ -97,6 +105,7 @@ function renderCompleted() {
     });
 }
 
+// Cria o elemento visual de cada tarefa.
 function createTaskCard(task, completed = false) {
     const card = document.createElement('article');
     card.className = `task-card ${task.urgency}`;
@@ -151,6 +160,7 @@ function createTaskCard(task, completed = false) {
     return card;
 }
 
+// Atualiza a solução/observação de uma tarefa e salva no estado.
 function updateTaskSolution(taskId, solution) {
     const task = state.tasks.find(item => item.id === taskId) || state.completed.find(item => item.id === taskId);
     if (!task) return;
@@ -160,6 +170,7 @@ function updateTaskSolution(taskId, solution) {
     showMessage('Observação salva com sucesso.');
 }
 
+// Configura as zonas onde é possível arrastar e soltar as tarefas.
 function setupDropZones() {
     dropZones.forEach(zoneId => {
         const zone = document.getElementById(zoneId);
@@ -185,6 +196,7 @@ function setupDropZones() {
     });
 }
 
+// Move tarefas entre colunas de prioridade e a coluna de concluídas.
 function moveTaskToZone(taskId, targetId) {
     const taskFromTasks = state.tasks.find(item => item.id === taskId);
     const taskFromCompleted = state.completed.find(item => item.id === taskId);
@@ -217,6 +229,7 @@ function moveTaskToZone(taskId, targetId) {
     }
 }
 
+// Alterna o status de concluída para em andamento e vice-versa.
 function toggleTaskStatus(taskId, completed) {
     if (completed) {
         const taskIndex = state.completed.findIndex(item => item.id === taskId);
@@ -236,6 +249,7 @@ function toggleTaskStatus(taskId, completed) {
     renderBoard();
 }
 
+// Exibe mensagens temporárias no topo do conteúdo principal.
 function showMessage(message) {
     const main = document.querySelector('main');
     const alertBox = document.createElement('div');
@@ -249,10 +263,12 @@ function showMessage(message) {
     setTimeout(() => alertBox.remove(), 3200);
 }
 
+// Salva o estado atual em localStorage, para manter as tarefas após recarregar a página.
 function saveState() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+// Carrega o estado salvo do localStorage, se houver.
 function loadState() {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (!stored) return;
