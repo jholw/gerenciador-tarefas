@@ -1,5 +1,43 @@
 # Gerenciador de Tarefas
 
+Sistema web desenvolvido para auxiliar na organização e gerenciamento de tarefas diárias, permitindo que atividades sejam classificadas por **urgência, importância e necessidade**. O objetivo é proporcionar maior produtividade, controle e foco nas atividades do dia a dia, facilitando a tomada de decisões sobre quais tarefas devem ser executadas primeiro.
+
+## Principais Funcionalidades
+
+* Cadastro e gerenciamento de tarefas.
+* Classificação por níveis de prioridade.
+* Organização baseada na Matriz de Eisenhower (Urgente x Importante).
+* Interface web simples, intuitiva e responsiva.
+* Alertas visuais para tarefas prioritárias.
+* Exibição dinâmica das atividades em andamento.
+* Utilitários JavaScript para automação de ações e atualização de informações em tempo real.
+* Controle do status das tarefas (Pendente, Em Andamento e Concluída).
+
+## Objetivo do Projeto
+
+Este projeto foi criado para oferecer uma solução prática para pessoas e equipes que desejam melhorar sua organização pessoal e profissional, reduzindo esquecimentos, aumentando a produtividade e mantendo o foco nas atividades que realmente geram resultados.
+
+## Tecnologias Utilizadas
+
+* HTML5
+* CSS3
+* JavaScript
+* Componentes de interface para notificações e alertas
+* Estrutura modular para fácil manutenção e expansão
+
+## Futuras Implementações
+
+* Sistema de autenticação de usuários.
+* Integração com calendário.
+* Notificações por e-mail.
+* Dashboard com métricas de produtividade.
+* Sincronização em nuvem.
+* Aplicativo mobile.
+
+## Licença
+
+Este projeto é disponibilizado para fins de estudo, aprendizado e desenvolvimento de soluções de gerenciamento de tarefas.
+
 **Gerenciador de Tarefas — Task Management PRO**
 
 - **Idioma:** Português (pt-BR)
@@ -13,7 +51,7 @@ Projeto para gerar e organizar tarefas diárias por urgência, importância e ne
 
 1. Abra um terminal na pasta do projeto:
 
-   cd C:\Users\SeuUsuario.moraes\Documents\Jhonny\Aprendizado-Projetos\gerenciador-tarefas
+   cd C:\Users\SeuUsuario\Documents\gerenciador-tarefas
 
 2. Instale dependências (se aplicável):
 
