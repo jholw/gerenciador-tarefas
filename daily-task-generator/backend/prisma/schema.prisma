@@ -1,0 +1,342 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  passwordHash  String?
+  avatar        String?
+  role          String   @default("COLLABORATOR") // ADMIN, MANAGER, COLLABORATOR, GUEST
+  googleId      String?  @unique
+  emailVerified Boolean  @default(false)
+  lastAccess    DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  ownedProjects     Project[]         @relation("ProjectOwner")
+  projectMembers    ProjectMember[]
+  teamMembers       TeamMember[]
+  assignedTasks     Task[]            @relation("TaskAssignee")
+  createdTasks      Task[]            @relation("TaskCreator")
+  taskComments      TaskComment[]
+  notifications     Notification[]
+  chatMessages      ChatMessage[]
+  reminders         Reminder[]
+  auditLogs         AuditLog[]
+  standups          Standup[]
+  refreshTokens     RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      String   @default("active") // active, archived
+  ownerId     String
+  owner       User     @relation("ProjectOwner", fields: [ownerId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  members       ProjectMember[]
+  tasks         Task[]
+  kanbanColumns KanbanColumn[]
+  sprints       ScrumSprint[]
+  standups      Standup[]
+  retrospectives Retrospective[]
+  chats         Chat[]
+  backlogItems  BacklogItem[]
+  notifications Notification[]
+
+  @@map("projects")
+}
+
+model ProjectMember {
+  id        String @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String  @default("COLLABORATOR") // MANAGER, COLLABORATOR, GUEST
+
+  @@unique([projectId, userId])
+  @@map("project_members")
+}
+
+model Team {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  members TeamMember[]
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id     String @id @default(cuid())
+  teamId String
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+model Task {
+  id              String   @id @default(cuid())
+  title           String
+  description     String?
+  priority        String   @default("medium") // low, medium, high, critical
+  status          String   @default("pending") // pending, in-progress, review, done
+  type            String   @default("task") // task, bug, feature, improvement, epic
+  storyPoints     Int      @default(0)
+  estimatedHours  Float    @default(0)
+  spentHours      Float    @default(0)
+  startDate       String?
+  endDate         String?
+  dueDate         String?
+  completedAt     String?
+  labels          String   @default("[]") // JSON array
+  blockers        String?
+  columnId        String?
+  column          KanbanColumn? @relation(fields: [columnId], references: [id])
+  sprintId        String?
+  sprint          ScrumSprint? @relation(fields: [sprintId], references: [id])
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignedTo      String?
+  assignee        User?    @relation("TaskAssignee", fields: [assignedTo], references: [id])
+  createdBy       String
+  creator         User     @relation("TaskCreator", fields: [createdBy], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  comments    TaskComment[]
+  attachments TaskAttachment[]
+  subtasks    Subtask[]
+  reminders   Reminder[]
+
+  @@map("tasks")
+}
+
+model Subtask {
+  id        String  @id @default(cuid())
+  taskId    String
+  task      Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  title     String
+  completed Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("subtasks")
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  comment   String
+  createdAt DateTime @default(now())
+
+  @@map("task_comments")
+}
+
+model TaskAttachment {
+  id         String @id @default(cuid())
+  taskId     String
+  task       Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  fileName   String
+  filePath   String
+  fileSize   Int    @default(0)
+  mimeType   String @default("application/octet-stream")
+  uploadedBy String
+  createdAt  DateTime @default(now())
+
+  @@map("task_attachments")
+}
+
+model KanbanColumn {
+  id        String @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String
+  order     Int
+  color     String @default("#6b7280")
+  wipLimit  Int    @default(0)
+
+  // Relations
+  tasks Task[]
+
+  @@map("kanban_columns")
+}
+
+model BacklogItem {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  priority    String   @default("medium")
+  storyPoints Int      @default(0)
+  status      String   @default("backlog") // backlog, refined, ready, committed
+  sprintId    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("backlog_items")
+}
+
+model ScrumSprint {
+  id              String   @id @default(cuid())
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name            String
+  goal            String?
+  startDate       String
+  endDate         String
+  status          String   @default("planning") // planning, active, completed
+  totalPoints     Int      @default(0)
+  completedPoints Int      @default(0)
+  createdAt       DateTime @default(now())
+  completedAt     String?
+
+  // Relations
+  tasks          Task[]
+  retrospectives Retrospective[]
+
+  @@map("scrum_sprints")
+}
+
+model Standup {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      String
+  yesterday String?
+  today     String?
+  blockers  String?
+  createdAt DateTime @default(now())
+
+  @@unique([projectId, userId, date])
+  @@map("standups")
+}
+
+model Retrospective {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sprintId    String
+  sprint      ScrumSprint @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+  wentWell    String   @default("[]") // JSON array
+  toImprove   String   @default("[]") // JSON array
+  actionItems String   @default("[]") // JSON array
+  appreciation String?
+  createdAt   DateTime @default(now())
+
+  @@map("retrospectives")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+  title     String
+  message   String
+  type      String   @default("info") // info, warning, success, error
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
+
+model Reminder {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId      String?
+  task        Task?    @relation(fields: [taskId], references: [id])
+  title       String
+  description String?
+  dueDate     String
+  remindBefore Int     @default(30) // minutes before
+  repeat      String   @default("none") // none, daily, weekly, monthly
+  active      Boolean  @default(true)
+  notified    Boolean  @default(false)
+  priority    String   @default("medium")
+  createdAt   DateTime @default(now())
+  lastNotified String?
+
+  @@map("reminders")
+}
+
+model Chat {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  name      String?
+  type      String   @default("project") // project, team, private
+  createdAt DateTime @default(now())
+
+  // Relations
+  messages ChatMessage[]
+
+  @@map("chats")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  message   String
+  type      String   @default("text") // text, system, task_update
+  createdAt DateTime @default(now())
+
+  @@map("chat_messages")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  action    String
+  entity    String?
+  entityId  String?
+  details   String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
