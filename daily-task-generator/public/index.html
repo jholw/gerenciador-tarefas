@@ -1,90 +1,783 @@
 <!DOCTYPE html>
-<!-- Página principal do Gerador de Tarefas Diárias. -->
 <html lang="pt-BR">
 <head>
-    <!-- Metadados para codificação de caracteres e layout responsivo. -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Tarefas Diárias</title>
+    <title>Gerenciador de Tarefas - Scrum & Kanban</title>
     <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/app.css">
+    <style>
+        /* ==================== HELP / INSTRUCTIVE TEXT ==================== */
+        .help-text {
+            background: rgba(6, 182, 212, 0.06);
+            border: 1px solid rgba(6, 182, 212, 0.15);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        .help-text .help-icon {
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .help-text strong {
+            color: #e2e8f0;
+        }
+
+        /* ==================== WELCOME / DASHBOARD EMPTY ==================== */
+        .welcome-dashboard {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 20px;
+            min-height: 60vh;
+        }
+        .welcome-dashboard .welcome-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        .welcome-dashboard h2 {
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+        }
+        .welcome-dashboard p {
+            color: var(--muted);
+            max-width: 480px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+        .welcome-dashboard .quick-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .welcome-dashboard .quick-action-btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.04);
+            color: #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .welcome-dashboard .quick-action-btn:hover {
+            background: rgba(6, 182, 212, 0.1);
+            border-color: rgba(6, 182, 212, 0.3);
+        }
+        .welcome-dashboard .quick-action-btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .welcome-dashboard .quick-action-btn.primary:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Welcome override for board section */
+        #section-board .welcome-dashboard {
+            display: flex;
+        }
+        #section-board.active.has-project .welcome-dashboard {
+            display: none;
+        }
+
+        /* ==================== SECTION INTRO ==================== */
+        .section-intro {
+            display: none;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .section-intro.visible {
+            display: block;
+        }
+        .section-intro .intro-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        .section-intro h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+        .section-intro p {
+            color: var(--muted);
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* ==================== NO-PROJECT INFO ==================== */
+        .no-project-info {
+            display: none;
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .no-project-info.visible {
+            display: block;
+        }
+        .no-project-info .npi-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+        }
+        .no-project-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+        .no-project-info p {
+            color: var(--muted);
+            max-width: 400px;
+            margin: 0 auto 16px;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
-    <!-- Container principal que envolve toda a aplicação. -->
-    <div id="app" class="container">
-        <!-- Cabeçalho com o título da aplicação e descrição. -->
-        <header class="app-header">
-            <div class="brand">
-                <h1>Gerenciador de Tarefas Diárias</h1>
-                <span class="tag">Quadro de tarefas diárias. Faça sua lista:
-
-                </span>
+    <div id="app">
+        <!-- Sidebar de navegação -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">📋</span>
+                <h2>TaskFlow</h2>
             </div>
-        </header>
-        <main>
-            <!-- Seção de entrada de nova tarefa. -->
-            <section class="panel" id="task-input">
-                <h2>Adicionar nova tarefa</h2>
-                <input type="text" id="task-title" placeholder="Título da tarefa" required>
-                <textarea id="task-description" placeholder="Descrição (opcional)"></textarea>
-                <!-- Controles para definir urgência, importância e adicionar a tarefa. -->
-                <div class="controls">
-                    <select id="task-urgency" aria-label="Urgência">
-                        <option value="high">Alta</option>
-                        <option value="medium">Média</option>
-                        <option value="low">Baixa</option>
-                    </select>
-                    <select id="task-importance" aria-label="Importância">
-                        <option value="high">Alta</option>
-                        <option value="medium">Média</option>
-                        <option value="low">Baixa</option>
-                    </select>
-                    <button id="add-task-btn" class="btn-primary">Adicionar</button>
+            
+            <!-- Perfil do usuário -->
+            <div class="user-profile" id="user-profile">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <div class="user-info">
+                    <span class="user-name" id="user-name">Usuário</span>
+                    <span class="user-email" id="user-email">email@exemplo.com</span>
+                </div>
+                <button class="btn-logout" id="btn-logout" title="Sair">⏻</button>
+            </div>
+            
+            <!-- Seletor de projeto -->
+            <div class="project-selector" id="project-selector">
+                <label>Projeto Atual</label>
+                <select id="project-select">
+                    <option value="">Selecione um projeto</option>
+                </select>
+                <button class="btn-icon" id="btn-new-project" title="Novo Projeto">➕</button>
+            </div>
+            
+            <!-- Navegação principal -->
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-section="board">
+                    <span>📋</span> Quadro Kanban
+                </button>
+                <button class="nav-item" data-section="backlog">
+                    <span>📥</span> Backlog
+                </button>
+                <button class="nav-item" data-section="sprints">
+                    <span>🏃</span> Sprints
+                </button>
+                <button class="nav-item" data-section="standup">
+                    <span>🌅</span> Daily Standup
+                </button>
+                <button class="nav-item" data-section="retro">
+                    <span>🔄</span> Retrospectiva
+                </button>
+                <button class="nav-item" data-section="reminders">
+                    <span>⏰</span> Lembretes
+                </button>
+                <button class="nav-item" data-section="stats">
+                    <span>📊</span> Estatísticas
+                </button>
+                <button class="nav-item" data-section="chat">
+                    <span>💬</span> Chat do Projeto
+                </button>
+                <button class="nav-item" data-section="members">
+                    <span>👥</span> Membros
+                </button>
+                <button class="nav-item" data-section="settings">
+                    <span>⚙️</span> Configurações
+                </button>
+            </nav>
+        </aside>
+        
+        <!-- Conteúdo principal -->
+        <main class="main-content" id="main-content">
+            
+            <!-- ===== SEÇÃO: QUADRO KANBAN ===== -->
+            <section class="section active" id="section-board">
+                <!-- Welcome Dashboard (exibido quando nenhum projeto está selecionado) -->
+                <div class="welcome-dashboard" id="welcome-dashboard">
+                    <div class="welcome-icon">📋</div>
+                    <h2>Bem-vindo ao TaskFlow</h2>
+                    <p>
+                        Gerencie suas tarefas, sprints e projetos com metodologias ágeis.
+                        Para começar, crie um novo projeto ou selecione um existente na barra lateral.
+                    </p>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn primary" id="welcome-btn-new-project">
+                            ➕ Criar Novo Projeto
+                        </button>
+                        <button class="quick-action-btn" id="welcome-btn-board-help">
+                            💡 Como usar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="board-content" style="display: none;">
+                    <div class="help-text" id="help-board">
+                        <span class="help-icon">💡</span>
+                        <div>
+                            <strong>Quadro Kanban</strong> — Arraste os cartões entre as colunas para atualizar o status das tarefas. 
+                            Use <strong>"Nova Tarefa"</strong> para adicionar atividades e <strong>"Personalizar"</strong> para ajustar as colunas. 
+                            Clique duas vezes em um cartão para ver detalhes, comentários e subtarefas.
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <h2>Quadro Kanban</h2>
+                        <div class="section-actions">
+                            <button class="btn-action" id="btn-add-task">➕ Nova Tarefa</button>
+                            <button class="btn-action" id="btn-customize-board">⚙️ Personalizar</button>
+                        </div>
+                    </div>
+                    <div class="board-container" id="board-container">
+                        <div class="board-grid" id="board-grid">
+                            <!-- Colunas serão renderizadas dinamicamente -->
+                        </div>
+                    </div>
                 </div>
             </section>
-            <!-- Seção principal do quadro Kanban com as colunas de prioridade. -->
-            <section class="board-panel">
-                <div class="board-header">
-                    <h2>Quadro de prioridades</h2>
-                    <p>Arraste sua rotina para alta, média ou baixa prioridade e marque como concluída.</p>
+            
+            <!-- ===== SEÇÃO: BACKLOG ===== -->
+            <section class="section" id="section-backlog">
+                <div class="help-text" id="help-backlog">
+                    <span class="help-icon">💡</span>
+                    <div>
+                        <strong>Backlog do Produto</strong> — Liste aqui todas as funcionalidades, melhorias e correções planejadas. 
+                        Use <strong>"Adicionar Item"</strong> para incluir novas demandas. 
+                        Itens refinados podem ser movidos para uma Sprint usando o botão 🏃.
+                    </div>
                 </div>
-                <div class="board-grid">
-                    <!-- Coluna de prioridade alta. -->
-                    <article class="column high-column">
-                        <div class="column-header">
-                            <h3>Alta</h3>
-                            <span>Prioridade alta</span>
-                        </div>
-                        <div id="high-column" class="column-body"></div>
-                    </article>
-                    <!-- Coluna de prioridade média. -->
-                    <article class="column medium-column">
-                        <div class="column-header">
-                            <h3>Média</h3>
-                            <span>Prioridade média</span>
-                        </div>
-                        <div id="medium-column" class="column-body"></div>
-                    </article>
-                    <!-- Coluna de prioridade baixa. -->
-                    <article class="column low-column">
-                        <div class="column-header">
-                            <h3>Baixa</h3>
-                            <span>Prioridade baixa</span>
-                        </div>
-                        <div id="low-column" class="column-body"></div>
-                    </article>
+                <div class="section-header">
+                    <h2>Backlog do Produto</h2>
+                    <div class="section-actions">
+                        <button class="btn-action" id="btn-add-backlog">➕ Adicionar Item</button>
+                        <button class="btn-action" id="btn-refine-backlog">📝 Refinar</button>
+                    </div>
+                </div>
+                <div class="backlog-container" id="backlog-container">
+                    <div class="backlog-filters">
+                        <input type="text" id="backlog-search" placeholder="Buscar no backlog...">
+                        <select id="backlog-filter-priority">
+                            <option value="">Todas prioridades</option>
+                            <option value="critical">Crítica</option>
+                            <option value="high">Alta</option>
+                            <option value="medium">Média</option>
+                            <option value="low">Baixa</option>
+                            <option value="trivial">Trivial</option>
+                        </select>
+                    </div>
+                    <div class="section-intro" id="backlog-intro">
+                        <p>Selecione um projeto na barra lateral para visualizar e gerenciar o backlog.</p>
+                    </div>
+                    <div class="backlog-list" id="backlog-list">
+                        <p class="empty-state">Backlog vazio. Adicione itens para planejar seu projeto.</p>
+                    </div>
                 </div>
             </section>
-            <!-- Seção de tarefas concluídas, exibindo o histórico recente. -->
-            <section class="panel completed-panel" id="completed-panel">
-                <div class="column-header">
-                    <h2>Concluídas</h2>
-                    <span>Tarefas finalizadas recentemente</span>
+            
+            <!-- ===== SEÇÃO: SPRINTS ===== -->
+            <section class="section" id="section-sprints">
+                <div class="help-text" id="help-sprints">
+                    <span class="help-icon">💡</span>
+                    <div>
+                        <strong>Sprints</strong> — Ciclos de desenvolvimento com duração definida. 
+                        Crie uma sprint com <strong>"Nova Sprint"</strong>, mova itens do backlog para ela, 
+                        depois use <strong>"Iniciar"</strong> para começar e <strong>"Finalizar"</strong> ao concluir.
+                    </div>
                 </div>
-                <div id="completed-tasks" class="column-body"></div>
+                <div class="section-header">
+                    <h2>Sprints</h2>
+                    <div class="section-actions">
+                        <button class="btn-action" id="btn-create-sprint">➕ Nova Sprint</button>
+                        <button class="btn-action" id="btn-start-sprint">▶️ Iniciar</button>
+                        <button class="btn-action" id="btn-complete-sprint">✅ Finalizar</button>
+                    </div>
+                </div>
+                <div class="section-intro" id="sprints-intro">
+                    <p>Selecione um projeto na barra lateral para gerenciar as sprints.</p>
+                </div>
+                <div class="sprints-container">
+                    <div class="sprint-list" id="sprint-list">
+                        <!-- Sprints serão renderizadas aqui -->
+                    </div>
+                    <div class="sprint-detail" id="sprint-detail">
+                        <p class="empty-state">Selecione uma sprint para ver detalhes</p>
+                    </div>
+                </div>
             </section>
+            
+            <!-- ===== SEÇÃO: DAILY STANDUP ===== -->
+            <section class="section" id="section-standup">
+                <div class="help-text" id="help-standup">
+                    <span class="help-icon">💡</span>
+                    <div>
+                        <strong>Daily Standup</strong> — Reunião diária para alinhar o time. 
+                        Responda: O que fez ontem? O que fará hoje? Há impedimentos? 
+                        Preencha os campos abaixo e clique em <strong>"Enviar"</strong> para registrar.
+                    </div>
+                </div>
+                <div class="section-header">
+                    <h2>Daily Standup</h2>
+                    <button class="btn-action" id="btn-submit-standup">📤 Enviar</button>
+                </div>
+                <div class="section-intro" id="standup-intro">
+                    <p>Selecione um projeto na barra lateral para registrar seu daily standup.</p>
+                </div>
+                <div class="standup-container">
+                    <form id="standup-form">
+                        <div class="form-group">
+                            <label>O que fez ontem?</label>
+                            <textarea id="standup-yesterday" placeholder="Descreva o que foi feito ontem..." rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>O que vai fazer hoje?</label>
+                            <textarea id="standup-today" placeholder="Descreva o plano para hoje..." rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Impedimentos?</label>
+                            <textarea id="standup-blockers" placeholder="Algo está bloqueando seu progresso?" rows="2"></textarea>
+                        </div>
+                    </form>
+                    <div class="standup-list" id="standup-list">
+                        <h3>Standups de Hoje</h3>
+                        <div id="standup-entries"></div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===== SEÇÃO: RETROSPECTIVA ===== -->
+            <section class="section" id="section-retro">
+                <div class="help-text" id="help-retro">
+                    <span class="help-icon">💡</span>
+                    <div>
+                        <strong>Retrospectiva da Sprint</strong> — Ao final de cada sprint, reflita sobre o que foi bem, 
+                        o que pode melhorar e quais ações tomar. Adicione itens em cada coluna e clique em <strong>"Salvar"</strong>.
+                    </div>
+                </div>
+                <div class="section-header">
+                    <h2>Retrospectiva da Sprint</h2>
+                    <button class="btn-action" id="btn-save-retro">💾 Salvar</button>
+                </div>
+                <div class="section-intro" id="retro-intro">
+                    <p>Selecione um projeto e complete uma sprint para realizar a retrospectiva.</p>
+                </div>
+                <div class="retro-container">
+                    <div class="retro-columns">
+                        <div class="retro-column good">
+                            <h3>👍 O que foi bem</h3>
+                            <div id="retro-good" class="retro-items">
+                                <!-- Itens serão adicionados aqui -->
+                            </div>
+                            <button class="btn-add-retro-item" data-section="wentWell">+ Adicionar</button>
+                        </div>
+                        <div class="retro-column improve">
+                            <h3>👎 O que melhorar</h3>
+                            <div id="retro-improve" class="retro-items">
+                                <!-- Itens serão adicionados aqui -->
+                            </div>
+                            <button class="btn-add-retro-item" data-section="toImprove">+ Adicionar</button>
+                        </div>
+                        <div class="retro-column actions">
+                            <h3>🎯 Ações</h3>
+                            <div id="retro-actions" class="retro-items">
+                                <!-- Itens serão adicionados aqui -->
+                            </div>
+                            <button class="btn-add-retro-item" data-section="actionItems">+ Adicionar</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===== SEÇÃO: LEMBRETES ===== -->
+            <section class="section" id="section-reminders">
+                <div class="help-text" id="help-reminders">
+                    <span class="help-icon">💡</span>
+                    <div>
+                        <strong>Lembretes</strong> — Crie alertas para não esquecer prazos e compromissos. 
+                        Defina título, data/hora, prioridade e repetição. Use os filtros para visualizar pendentes, 
+                        atrasados ou próximos lembretes.
+                    </div>
+                </div>
+                <div class="section-header">
+                    <h2>Lembretes</h2>
+                    <button class="btn-action" id="btn-add-reminder">⏰ Novo Lembrete</button>
+                </div>
+                <div class="reminders-container">
+                    <div class="reminder-filters">
+                        <button class="filter-btn active" data-filter="all">Todos</button>
+                        <button class="filter-btn" data-filter="pending">Pendentes</button>
+                        <button class="filter-btn" data-filter="overdue">Atrasados</button>
+                        <button class="filter-btn" data-filter="upcoming">Próximos</button>
+                    </div>
+                    <div class="reminder-list" id="reminder-list">
+                        <p class="empty-state">Nenhum lembrete cadastrado.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===== SEÇÃO: ESTATÍSTICAS ===== -->
+            <section class="section" id="section-stats">
+                <div class="help-text" id="help-stats">
+                    <span class="help-icon">💡</span>
+                    <div>
+                        <strong>Estatísticas</strong> — Acompanhe métricas do projeto: total de tarefas, concluídas, 
+                        em andamento, pontos de história e velocidade do time. O gráfico mostra o burndown da sprint ativa.
+                    </div>
+                </div>
+                <div class="section-header">
+                    <h2>Estatísticas do Projeto</h2>
+                    <button class="btn-action" id="btn-refresh-stats">🔄 Atualizar</button>
+                </div>
+                <div class="section-intro" id="stats-intro">
+                    <p>Selecione um projeto na barra lateral para visualizar as estatísticas.</p>
+                </div>
+                <div class="stats-container">
+                    <div class="stats-grid" id="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-total">0</span>
+                            <span class="stat-label">Total de Tarefas</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-completed">0</span>
+                            <span class="stat-label">Concluídas</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-in-progress">0</span>
+                            <span class="stat-label">Em Andamento</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-overdue">0</span>
+                            <span class="stat-label">Atrasadas</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-points">0</span>
+                            <span class="stat-label">Story Points</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="stat-velocity">0</span>
+                            <span class="stat-label">Velocidade Média</span>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Burn down Chart</h3>
+                        <canvas id="burndown-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===== SEÇÃO: CHAT ===== -->
+            <section class="section" id="section-chat">
+                <div class="help-text" id="help-chat">
+                    <span class="help-icon">💡</span>
+                    <div>
+                        <strong>Chat do Projeto</strong> — Comunicação em tempo real com a equipe. 
+                        Digite sua mensagem no campo abaixo e pressione Enter ou clique em 📤 para enviar. 
+                        Use <strong>@nome</strong> para mencionar colegas.
+                    </div>
+                </div>
+                <div class="section-header">
+                    <h2>Chat do Projeto</h2>
+                    <span class="chat-project-name" id="chat-project-name"></span>
+                </div>
+                <div class="section-intro" id="chat-intro">
+                    <p>Selecione um projeto na barra lateral para acessar o chat da equipe.</p>
+                </div>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chat-messages">
+                        <p class="empty-state">Nenhuma mensagem ainda. Envie a primeira!</p>
+                    </div>
+                    <div class="chat-input-area">
+                        <textarea id="chat-input" placeholder="Digite sua mensagem... (@ para menções)" rows="2"></textarea>
+                        <button class="btn-send" id="btn-send-chat">📤</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===== SEÇÃO: MEMBROS ===== -->
+            <section class="section" id="section-members">
+                <div class="help-text" id="help-members">
+                    <span class="help-icon">💡</span>
+                    <div>
+                        <strong>Membros do Projeto</strong> — Gerencie a equipe adicionando ou removendo participantes. 
+                        O proprietário do projeto é destacado com 👑. Apenas membros podem visualizar e interagir com o projeto.
+                    </div>
+                </div>
+                <div class="section-header">
+                    <h2>Membros do Projeto</h2>
+                    <button class="btn-action" id="btn-add-member">👤 Adicionar Membro</button>
+                </div>
+                <div class="section-intro" id="members-intro">
+                    <p>Selecione um projeto na barra lateral para gerenciar os membros.</p>
+                </div>
+                <div class="members-container" id="members-container">
+                    <p class="empty-state">Selecione um projeto para ver os membros.</p>
+                </div>
+            </section>
+            
+            <!-- ===== SEÇÃO: CONFIGURAÇÕES ===== -->
+            <section class="section" id="section-settings">
+                <div class="help-text" id="help-settings">
+                    <span class="help-icon">💡</span>
+                    <div>
+                        <strong>Configurações</strong> — Personalize seu perfil, preferências de notificação 
+                        e gerencie seus dados (exportar/importar backup ou limpar tudo).
+                    </div>
+                </div>
+                <div class="section-header">
+                    <h2>Configurações</h2>
+                    <button class="btn-action" id="btn-save-settings">💾 Salvar</button>
+                </div>
+                <div class="settings-container">
+                    <div class="settings-group">
+                        <h3>Perfil</h3>
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" id="settings-name" placeholder="Seu nome">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="settings-email" placeholder="seu@email.com">
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <h3>Preferências</h3>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="settings-notifications">
+                                <span>Notificações do sistema</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="settings-sound">
+                                <span>Som de notificação</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="settings-group">
+                        <h3>Gerenciar Dados</h3>
+                        <button class="btn-action btn-danger" id="btn-export-data">📤 Exportar Dados</button>
+                        <button class="btn-action btn-danger" id="btn-import-data">📥 Importar Dados</button>
+                        <button class="btn-action btn-danger" id="btn-clear-data">🗑️ Limpar Todos os Dados</button>
+                    </div>
+                </div>
+            </section>
+            
         </main>
     </div>
-    <!-- Script principal que cria a lógica de tarefas, drag and drop e persistência. -->
+    
+    <!-- ===== MODAIS ===== -->
+    
+    <!-- Modal Nova Tarefa -->
+    <div class="modal-overlay" id="modal-task">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Nova Tarefa</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="task-form">
+                <div class="form-group">
+                    <label>Título *</label>
+                    <input type="text" id="task-title" placeholder="Título da tarefa" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="task-description" placeholder="Descrição detalhada..." rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Prioridade</label>
+                        <select id="task-priority">
+                            <option value="critical">Crítica</option>
+                            <option value="high">Alta</option>
+                            <option value="medium" selected>Média</option>
+                            <option value="low">Baixa</option>
+                            <option value="trivial">Trivial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="task-type">
+                            <option value="task">Tarefa</option>
+                            <option value="bug">Bug</option>
+                            <option value="feature">Funcionalidade</option>
+                            <option value="improvement">Melhoria</option>
+                            <option value="epic">Épico</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Story Points</label>
+                        <input type="number" id="task-points" min="0" max="100" value="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Prazo</label>
+                        <input type="date" id="task-due">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Responsável</label>
+                    <select id="task-assignee"></select>
+                </div>
+                <div class="form-group">
+                    <label>Coluna *</label>
+                    <select id="task-column">
+                        <option value="">Selecione uma coluna...</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary btn-full" id="btn-create-task-submit">Criar Tarefa</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Personalizar Quadro -->
+    <div class="modal-overlay" id="modal-customize-board">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Personalizar Quadro Kanban</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="column-list" id="column-list">
+                    <!-- Colunas serão listadas aqui -->
+                </div>
+                <button class="btn-action" id="btn-add-column">➕ Adicionar Coluna</button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" id="btn-save-columns">💾 Salvar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Novo Projeto -->
+    <div class="modal-overlay" id="modal-project">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Novo Projeto</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="project-form">
+                <div class="form-group">
+                    <label>Nome do Projeto *</label>
+                    <input type="text" id="project-name" placeholder="Nome do projeto" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="project-description" placeholder="Descrição do projeto..." rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Duração da Sprint (dias)</label>
+                    <input type="number" id="project-sprint-duration" value="14" min="1" max="30">
+                </div>
+                <button type="submit" class="btn-primary btn-full">Criar Projeto</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Lembrete -->
+    <div class="modal-overlay" id="modal-reminder">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Novo Lembrete</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="reminder-form">
+                <div class="form-group">
+                    <label>Título *</label>
+                    <input type="text" id="reminder-title" placeholder="Título do lembrete" required>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <textarea id="reminder-description" placeholder="Descrição..." rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Data/Hora *</label>
+                    <input type="datetime-local" id="reminder-due" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Lembrar antes (min)</label>
+                        <input type="number" id="reminder-before" value="30" min="0" max="1440">
+                    </div>
+                    <div class="form-group">
+                        <label>Prioridade</label>
+                        <select id="reminder-priority">
+                            <option value="critical">Crítica</option>
+                            <option value="high">Alta</option>
+                            <option value="medium" selected>Média</option>
+                            <option value="low">Baixa</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Repetir</label>
+                    <select id="reminder-repeat">
+                        <option value="none">Não repetir</option>
+                        <option value="daily">Diariamente</option>
+                        <option value="weekly">Semanalmente</option>
+                        <option value="monthly">Mensalmente</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary btn-full">Criar Lembrete</button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal Adicionar Membro -->
+    <div class="modal-overlay" id="modal-member">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Adicionar Membro</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Selecione o usuário</label>
+                    <select id="member-select"></select>
+                </div>
+                <button class="btn-primary btn-full" id="btn-add-member-confirm">Adicionar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Detalhes da Tarefa -->
+    <div class="modal-overlay" id="modal-task-detail">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3 id="task-detail-title">Detalhes da Tarefa</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="task-detail-body">
+                <!-- Conteúdo será preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sistema de notificação in-app -->
+    <div class="notification-container" id="notification-container"></div>
+    
+    <script src="scripts/modules/db/database.js"></script>
+    <script src="scripts/modules/auth/auth.js"></script>
+    <script src="scripts/modules/scrum/scrum.js"></script>
+    <script src="scripts/modules/chat/chat.js"></script>
+    <script src="scripts/modules/reminders/reminders.js"></script>
     <script src="scripts/main.js"></script>
 </body>
 </html>
