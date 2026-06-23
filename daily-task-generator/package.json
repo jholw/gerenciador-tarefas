@@ -1,32 +1,35 @@
 {
   "name": "daily-task-generator",
-  "version": "1.0.0",
-  "description": "A daily task generator application that organizes tasks by urgency, importance, and necessity.",
-  "main": "public/scripts/main.js",
+  "version": "2.0.0",
+  "description": "Daily Task Generator - Plataforma Completa de Gerenciamento de Tarefas e Produtividade com Scrum, Kanban, Chat em Tempo Real e Autenticação",
+  "private": true,
   "scripts": {
-    "start": "live-server public",
-    "test": "jest"
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd backend && npm run build && cd ../frontend && npm run build",
+    "start": "cd backend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "db:migrate": "cd backend && npx prisma migrate dev",
+    "db:seed": "cd backend && npx prisma db seed",
+    "test": "cd backend && npm test && cd ../frontend && npm test",
+    "lint": "cd backend && npm run lint && cd ../frontend && npm run lint"
   },
   "keywords": [
     "task",
-    "generator",
     "management",
-    "urgency",
-    "importance"
+    "scrum",
+    "kanban",
+    "productivity",
+    "agile"
   ],
-  "author": "Your Name",
+  "author": "Daily Task Generator Team",
   "license": "MIT",
-  "dependencies": {
-    "live-server": "^1.2.1",
-    "jest": "^27.0.6"
+  "devDependencies": {
+    "concurrently": "^8.2.0"
   },
-  "devDependencies": {},
-  "homepage": "https://github.com/yourusername/daily-task-generator",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/yourusername/daily-task-generator.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/daily-task-generator/issues"
-  }
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
 }
