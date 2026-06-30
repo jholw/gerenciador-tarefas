@@ -33,29 +33,34 @@ class Auth {
       // Carrega a API do Google Identity Services
       this._loadGoogleAPI()
         .then(() => {
-          const client = google.accounts.oauth2.initCodeClient({
+          // Usa Token Client (mais simples para frontend-only)
+          const tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: GOOGLE_CLIENT_ID,
             scope: 'email profile openid',
-            ux_mode: 'popup',
-            callback: async (response) => {
-              if (response.code) {
+            callback: async (tokenResponse) => {
+              if (tokenResponse.access_token) {
                 try {
-                  // Troca o código por informações do usuário
-                  const userInfo = await this._exchangeCodeForUserInfo(response.code);
-                  const user = await this._handleGoogleUser(userInfo);
-                  resolve(user);
+                  // Busca informações do usuário com o token
+                  const userInfo = await this._fetchGoogleUserInfo(tokenResponse.access_token);
+                  if (userInfo && userInfo.id) {
+                    const user = await this._handleGoogleUser(userInfo);
+                    resolve(user);
+                  } else {
+                    reject(new Error('Não foi possível obter informações do perfil Google'));
+                  }
                 } catch (err) {
                   reject(err);
                 }
               } else {
-                reject(new Error('Falha na autenticação com Google'));
+                reject(new Error(tokenResponse.error || 'Falha na autenticação com Google'));
               }
             },
             error_callback: (error) => {
-              reject(error);
+              console.error('Google Auth error:', error);
+              reject(new Error(error.message || 'Erro na autenticação com Google'));
             }
           });
-          client.requestCode();
+          tokenClient.requestAccessToken({ prompt: 'consent' });
         })
         .catch(reject);
     });
@@ -63,7 +68,7 @@ class Auth {
 
   _loadGoogleAPI() {
     return new Promise((resolve, reject) => {
-      if (typeof google !== 'undefined') {
+      if (typeof google !== 'undefined' && google.accounts) {
         resolve();
         return;
       }
@@ -78,41 +83,35 @@ class Auth {
     });
   }
 
-  async _exchangeCodeForUserInfo(code) {
-    // Em produção, isso deve ser feito no backend
-    // Para versão local, decodificamos o token JWT manualmente
-    
-    // Fallback: Usar Google Identity Services para obter informações
-    return new Promise((resolve, reject) => {
-      try {
-        // Tenta usar o token
-        const tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: GOOGLE_CLIENT_ID,
-          scope: 'email profile openid',
-          callback: (tokenResponse) => {
-            if (tokenResponse.access_token) {
-              // Busca informações do usuário
-              fetch('https://www.googleapis.com/oauth2/v1/userinfo?alt=json', {
-                headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
-              })
-                .then(res => res.json())
-                .then(data => resolve({ id: data.id, email: data.email, name: data.name, picture: data.picture }))
-                .catch(err => reject(err));
-            } else {
-              reject(new Error('Falha ao obter token'));
-            }
-          }
-        });
-        tokenClient.requestAccessToken();
-      } catch (e) {
-        reject(e);
+  async _fetchGoogleUserInfo(accessToken) {
+    try {
+      const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Falha ao buscar informações do usuário Google');
       }
-    });
+      
+      const data = await response.json();
+      return {
+        id: data.id,
+        email: data.email,
+        name: data.name,
+        picture: data.picture
+      };
+    } catch (err) {
+      console.error('Erro ao buscar user info Google:', err);
+      throw err;
+    }
   }
 
   async _handleGoogleUser(googleInfo) {
-    // Verifica se usuário já existe
-    let users = await db.getByIndex(STORES.USERS, 'googleId', googleInfo.id);
+    // Garante que temos um ID único
+    const googleId = String(googleInfo.id);
+    
+    // Verifica se usuário já existe pelo googleId
+    let users = await db.getByIndex(STORES.USERS, 'googleId', googleId);
     
     if (users && users.length > 0) {
       const user = users[0];
@@ -128,7 +127,7 @@ class Auth {
     users = await db.getByIndex(STORES.USERS, 'email', googleInfo.email);
     if (users && users.length > 0) {
       const user = users[0];
-      user.googleId = googleInfo.id;
+      user.googleId = googleId;
       user.lastLogin = new Date().toISOString();
       user.picture = googleInfo.picture || user.picture;
       user.emailVerified = true;
@@ -140,10 +139,10 @@ class Auth {
     
     // Cria novo usuário
     const newUser = {
-      id: 'google_' + googleInfo.id,
+      id: 'google_' + googleId,
       name: googleInfo.name,
       email: googleInfo.email,
-      googleId: googleInfo.id,
+      googleId: googleId,
       picture: googleInfo.picture || '',
       password: '', // Sem senha para login social
       createdAt: new Date().toISOString(),

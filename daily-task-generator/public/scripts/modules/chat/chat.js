@@ -107,17 +107,30 @@ class ChatManager {
   _startPolling() {
     if (this.pollInterval) clearInterval(this.pollInterval);
     
-    let lastTimestamp = new Date().toISOString();
+    this.lastPollTimestamp = new Date().toISOString();
     
     this.pollInterval = setInterval(async () => {
       if (!this.currentProjectId) return;
       
       try {
+        // Otimização: usa getAll para ter acesso ao autoIncrement ID
+        // e filtra apenas mensagens novas comparando timestamp
         const allMessages = await db.getByIndex(STORES.MESSAGES, 'projectId', this.currentProjectId);
-        const newMessages = allMessages.filter(m => m.timestamp > lastTimestamp && m.senderId !== this.currentUserId);
+        
+        if (!allMessages || allMessages.length === 0) return;
+        
+        const newMessages = allMessages.filter(m => 
+          m.timestamp > this.lastPollTimestamp && 
+          m.senderId !== this.currentUserId
+        );
         
         if (newMessages.length > 0) {
-          lastTimestamp = new Date().toISOString();
+          // Atualiza o timestamp para a mais recente mensagem nova
+          const latestTimestamp = newMessages.reduce((latest, msg) => 
+            msg.timestamp > latest ? msg.timestamp : latest, this.lastPollTimestamp
+          );
+          this.lastPollTimestamp = latestTimestamp;
+          
           for (const msg of newMessages) {
             this._notifyListeners(msg);
           }
@@ -125,7 +138,7 @@ class ChatManager {
       } catch (e) {
         // Silencia erros de polling
       }
-    }, 2000); // Poll a cada 2 segundos
+    }, 3000); // Poll a cada 3 segundos (reduzido de 2s para 3s para menor uso de CPU)
   }
 
   stopPolling() {
