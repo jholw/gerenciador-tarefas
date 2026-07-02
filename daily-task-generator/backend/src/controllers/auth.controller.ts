@@ -19,6 +19,15 @@ export const refreshSchema = z.object({
   refreshToken: z.string().min(1, 'Refresh token é obrigatório'),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: z.string().email('Email inválido'),
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, 'Token é obrigatório'),
+  password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
+});
+
 export class AuthController {
   async register(req: Request, res: Response, next: NextFunction) {
     try {
@@ -95,6 +104,26 @@ export class AuthController {
     try {
       const users = await authService.getAllUsers();
       res.json({ success: true, data: users });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async forgotPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { email } = forgotPasswordSchema.parse(req.body);
+      const result = await authService.forgotPassword(email);
+      res.json({ success: true, data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async resetPassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { token, password } = resetPasswordSchema.parse(req.body);
+      const result = await authService.resetPassword(token, password);
+      res.json({ success: true, data: result, message: 'Senha redefinida com sucesso' });
     } catch (error) {
       next(error);
     }

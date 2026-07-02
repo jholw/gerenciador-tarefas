@@ -40,6 +40,10 @@ router.post('/login', authController.login);
 router.post('/refresh', authController.refreshToken);
 router.post('/logout', authController.logout);
 
+// Rotas de recuperação de senha
+router.post('/forgot-password', authController.forgotPassword);
+router.post('/reset-password', authController.resetPassword);
+
 // Rotas de perfil (autenticadas)
 router.get('/profile', authenticate, authController.getProfile);
 router.put('/profile', authenticate, authController.updateProfile);
