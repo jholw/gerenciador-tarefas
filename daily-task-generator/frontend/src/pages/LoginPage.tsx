@@ -144,6 +144,17 @@ export default function LoginPage() {
             >
               {loading ? 'Processando...' : isLogin ? 'Entrar' : 'Criar Conta'}
             </button>
+
+            {isLogin && (
+              <div className="text-center mt-4">
+                <a
+                  href="/forgot-password"
+                  className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                >
+                  Esqueceu sua senha?
+                </a>
+              </div>
+            )}
           </form>
 
           {/* Divider */}
