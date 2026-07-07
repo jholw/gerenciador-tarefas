@@ -12,3 +12,6 @@ yarn-error.log*
 
 # System
 .DS_Store
+
+# Test users file
+Test-users.txt
