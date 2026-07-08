@@ -1,7 +1,8 @@
 ﻿# Gerenciador de Tarefas - Plataforma Completa de Gerenciamento Ágil
 
-![Version](https://img.shields.io/badge/version-2.0.1-blue)
+![Version](https://img.shields.io/badge/version-2.1.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
 
 ## 📋 Visão Geral
 

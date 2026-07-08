@@ -1,6 +1,6 @@
 {
   "name": "daily-task-generator",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Daily Task Generator - Plataforma Completa de Gerenciamento de Tarefas e Produtividade com Scrum, Kanban, Chat em Tempo Real e Autenticação",
   "private": true,
   "scripts": {
@@ -26,7 +26,7 @@
   "author": "Daily Task Generator Team",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^9.1.0"
   },
   "workspaces": [
     "backend",
