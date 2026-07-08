@@ -1,7 +1,7 @@
 ﻿# Gerenciador de Tarefas - Plataforma Completa de Gerenciamento Ágil
 
 ![Version](https://img.shields.io/badge/version-2.1.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-Proprietary-red)
 ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
 
 ## 📋 Visão Geral
@@ -236,8 +236,13 @@ Contribuições são bem-vindas! Siga os passos:
 
 ## 📄 Licença
 
-Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
+**DIREITOS RESERVADOS** - Copyright (c) 2024-2026 Jhonny Moraes
+
+Este software é proprietário. Todos os direitos reservados.
+É proibida a reprodução, distribuição, modificação ou uso não autorizado.
+
+Consulte o arquivo [LICENSE](../LICENSE) e [EULA](../EULA.md) para detalhes.
 
 ---
 
-**Desenvolvido com ❤️ | TaskFlow - Gerenciamento Ágil de Projetos**
+**© 2024-2026 Jhonny Moraes | TaskFlow v2.1.0 - Todos os direitos reservados.**

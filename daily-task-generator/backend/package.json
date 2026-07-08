@@ -2,6 +2,8 @@
   "name": "daily-task-generator-backend",
   "version": "2.1.0",
   "description": "Backend da aplicação Daily Task Generator",
+  "author": "Jhonny Moraes <jhonnymoraes.dev@gmail.com>",
+  "license": "UNLICENSED",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

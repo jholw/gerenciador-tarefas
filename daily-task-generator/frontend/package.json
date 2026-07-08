@@ -2,6 +2,8 @@
   "name": "daily-task-generator-frontend",
   "private": true,
   "version": "2.1.0",
+  "author": "Jhonny Moraes <jhonnymoraes.dev@gmail.com>",
+  "license": "UNLICENSED",
   "type": "module",
   "scripts": {
     "dev": "vite",

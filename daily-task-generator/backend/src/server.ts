@@ -1,3 +1,10 @@
+/*
+ * TaskFlow - Gerenciador de Tarefas
+ * Copyright (c) 2024-2026 Jhonny Moraes. Todos os direitos reservados.
+ * Software proprietário - Uso não autorizado proibido.
+ * Contato: jhonnymoraes.dev@gmail.com
+ */
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';

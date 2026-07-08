@@ -3,7 +3,7 @@
 Sistema web completo para gerenciamento de tarefas diárias com metodologias ágeis (Scrum e Kanban), desenvolvido em três camadas: **Standalone (HTML/JS)**, **Backend (Express + Prisma)** e **Frontend (React + TypeScript)**.
 
 ![Version](https://img.shields.io/badge/version-2.1.0-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![License](https://img.shields.io/badge/license-Proprietary-red)
 ![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen)
 
 ---
@@ -521,8 +521,12 @@ sudo systemctl restart nginx
 
 ## 📄 Licença
 
-MIT © [Daily Task Generator Team](https://github.com/jholw/gerenciador-tarefas)
+**DIREITOS RESERVADOS** - Copyright (c) 2024-2026 Jhonny Moraes
+
+Este software é proprietário. Todos os direitos reservados.
+É proibida a reprodução, distribuição, modificação ou uso não autorizado.
+Consulte o arquivo [LICENSE](./LICENSE) para detalhes.
 
 ---
 
-**Desenvolvido com ❤️ | TaskFlow v2.1.0**
+**© 2024-2026 Jhonny Moraes | TaskFlow v2.1.0 - Todos os direitos reservados.**

@@ -1,3 +1,10 @@
+/*
+ * TaskFlow - Gerenciador de Tarefas
+ * Copyright (c) 2024-2026 Jhonny Moraes. Todos os direitos reservados.
+ * Software proprietário - Uso não autorizado proibido.
+ * Contato: jhonnymoraes.dev@gmail.com
+ */
+
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';

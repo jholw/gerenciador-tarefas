@@ -23,8 +23,8 @@
     "productivity",
     "agile"
   ],
-  "author": "Daily Task Generator Team",
-  "license": "MIT",
+  "author": "Jhonny Moraes <jhonnymoraes.dev@gmail.com>",
+  "license": "UNLICENSED",
   "devDependencies": {
     "concurrently": "^9.1.0"
   },
