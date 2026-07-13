@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { authService } from '../services/auth.service';
 import { AuthRequest } from '../types';
+import { config } from '../config';
 
 // Schemas de validação
 export const registerSchema = z.object({
@@ -53,7 +54,9 @@ export class AuthController {
     try {
       const googleUser = (req as any).user;
       const result = await authService.googleLogin(googleUser);
-      res.json({ success: true, data: result, message: 'Login Google realizado com sucesso' });
+      // Redireciona para o frontend com os tokens na URL
+      const redirectUrl = `${config.frontendUrl}/auth/callback?token=${result.accessToken}&refreshToken=${result.refreshToken}&user=${encodeURIComponent(JSON.stringify(result.user))}`;
+      res.redirect(redirectUrl);
     } catch (error) {
       next(error);
     }
