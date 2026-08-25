@@ -8,7 +8,18 @@
 
 Aplicação web moderna para gerenciamento de tarefas individuais e colaborativas, utilizando conceitos de **Scrum**, **Kanban** e **Gestão Ágil**. O sistema oferece controle completo de projetos, tarefas, equipes, comunicação interna e acompanhamento de produtividade em ambiente centralizado.
 
-Versão **standalone** com IndexedDB (funciona offline, sem necessidade de servidor backend).
+A plataforma agora conta com uma página de apresentação pública inspirada no layout de Trello e com uma área autenticada protegida para usuários logados. Os dados de usuários, projetos, conexões e sessões passam a ser persistidos em um banco PostgreSQL para manter integridade e continuidade mesmo após reiniciar a aplicação.
+
+## 🧭 Página de apresentação
+
+A landing page pública foi montada para apresentar o portal de forma profissional, com:
+- cabeçalho com ações de login e cadastro
+- hero section com visão geral e benefícios do produto
+- blocos de funcionalidade com imagens ilustrativas
+- explicação do fluxo do processo ágil da plataforma
+- CTA para acesso ao login e criação de conta
+
+A rota principal da aplicação foi definida como `/`, enquanto o painel autenticado fica disponível em `/app`.
 
 ## 🚀 Funcionalidades Principais
 
@@ -97,7 +108,7 @@ Versão **standalone** com IndexedDB (funciona offline, sem necessidade de servi
 | Express | 4.18 | Framework HTTP |
 | TypeScript | 5.3 | Tipagem estática |
 | Prisma ORM | 5.10 | ORM e migrations |
-| SQLite | - | Banco de dados (dev) |
+| PostgreSQL | 16 | Banco de dados persistente para usuários, projetos e conexões |
 | Socket.IO | 4.7 | WebSockets |
 
 ## 📁 Estrutura do Projeto
@@ -140,31 +151,58 @@ daily-task-generator/
 └── package.json
 ```
 
-## 🚀 Como Executar (Versão Standalone)
+## 🚀 Como Executar
 
 ### Pré-requisitos
-- Navegador moderno (Chrome, Firefox, Edge, etc.)
-- Nenhum servidor necessário - funciona 100% offline com IndexedDB
+- Node.js 20+
+- npm
+- Docker Desktop ou PostgreSQL 16 instalado localmente
 
-### Execução
+### 1) Subir o PostgreSQL local
+O projeto foi configurado para uso com PostgreSQL em ambiente local e persistência via volume Docker.
 
-**Opção 1:** Abra diretamente no navegador
 ```bash
-# Abra o arquivo index.html
-daily-task-generator/public/index.html
+cd daily-task-generator
+docker compose up -d postgres
 ```
 
-**Opção 2:** Use um servidor local (recomendado)
-```bash
-# Com Python
-cd daily-task-generator/public
-python -m http.server 8080
+Isso iniciará um container PostgreSQL com dados persistidos em um volume chamado `postgres_data`.
 
-# Com Node.js (http-server)
-npx http-server daily-task-generator/public -p 8080
+### 2) Configurar variáveis de ambiente
+No backend, ajuste o arquivo `.env` conforme o exemplo abaixo:
+
+```env
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/daily_task_generator?schema=public"
+JWT_SECRET="daily-task-generator-jwt-secret-change-in-production"
+JWT_REFRESH_SECRET="daily-task-generator-refresh-secret-change-in-production"
+PORT=3001
+NODE_ENV=development
+FRONTEND_URL="http://localhost:5173"
 ```
 
-Depois acesse: **http://localhost:8080**
+O arquivo de exemplo já está em `backend/.env.example`.
+
+### 3) Rodar as migrações do Prisma
+```bash
+cd backend
+npx prisma generate
+npx prisma migrate dev
+```
+
+### 4) Iniciar a aplicação
+```bash
+cd daily-task-generator
+npm install
+npm run dev
+```
+
+Acesse:
+- Landing page pública: http://localhost:5173/
+- Login e cadastro: http://localhost:5173/login
+- Área autenticada: http://localhost:5173/app
+
+### 5) Produzir dados persistentes
+Com o banco PostgreSQL rodando em container, todos os registros de usuários, projetos e conexões ficam salvos mesmo ao fechar e reabrir a aplicação, desde que o container continue disponível.
 
 ## 🐛 Correções Recentes (v2.0.1)
 
@@ -221,8 +259,30 @@ const GOOGLE_CLIENT_ID = 'seu-client-id-aqui';
 
 ## 🗄️ Banco de Dados
 
-- **Versão standalone:** IndexedDB (navegador) - nenhuma instalação necessária
-- **Backend React:** SQLite (dev) / PostgreSQL (prod)
+A persistência principal do sistema foi migrada para PostgreSQL para garantir armazenamento estável de usuários, projetos, sessões e dados de conexão.
+
+### Estrutura local
+- Serviço PostgreSQL em Docker: `docker compose up -d postgres`
+- Banco principal: `daily_task_generator`
+- Usuário: `postgres`
+- Senha: `postgres`
+- Porta: `5432`
+- Persistência: volume Docker `postgres_data`
+
+### Comando para verificar conexão
+```bash
+docker compose ps
+```
+
+### Caso queira remover os dados
+```bash
+docker compose down -v
+```
+
+> Isso remove também os dados persistidos no volume do banco.
+
+### Observação
+O SQLite foi mantido apenas como referência histórica do projeto. A configuração ativa do backend foi migrada para PostgreSQL para atender ao requisito de armazenamento contínuo e confiável.
 
 ## 🤝 Contribuição
 

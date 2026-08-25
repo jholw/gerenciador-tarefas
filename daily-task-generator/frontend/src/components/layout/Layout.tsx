@@ -5,16 +5,16 @@ import { useSocket } from '../../contexts/SocketContext';
 import { cn, getInitials } from '../../lib/utils';
 
 const navigation = [
-  { name: 'Dashboard', path: '/', icon: '📊' },
-  { name: 'Quadro Kanban', path: '/board', icon: '📋' },
-  { name: 'Backlog', path: '/backlog', icon: '📥' },
-  { name: 'Sprints', path: '/sprints', icon: '🏃' },
-  { name: 'Daily Standup', path: '/standup', icon: '🌅' },
-  { name: 'Retrospectiva', path: '/retrospective', icon: '🔄' },
-  { name: 'Chat', path: '/chat', icon: '💬' },
-  { name: 'Membros', path: '/members', icon: '👥' },
-  { name: 'Relatórios', path: '/reports', icon: '📈' },
-  { name: 'Configurações', path: '/settings', icon: '⚙️' },
+  { name: 'Dashboard', path: '/app', icon: '📊' },
+  { name: 'Quadro Kanban', path: '/app/board', icon: '📋' },
+  { name: 'Backlog', path: '/app/backlog', icon: '📥' },
+  { name: 'Sprints', path: '/app/sprints', icon: '🏃' },
+  { name: 'Daily Standup', path: '/app/standup', icon: '🌅' },
+  { name: 'Retrospectiva', path: '/app/retrospective', icon: '🔄' },
+  { name: 'Chat', path: '/app/chat', icon: '💬' },
+  { name: 'Membros', path: '/app/members', icon: '👥' },
+  { name: 'Relatórios', path: '/app/reports', icon: '📈' },
+  { name: 'Configurações', path: '/app/settings', icon: '⚙️' },
 ];
 
 export default function Layout() {

@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import prisma from '../config/prisma';
@@ -139,9 +139,11 @@ export class AuthService {
   }
 
   async generateTokens(userId: string) {
-    const accessToken = jwt.sign({ userId }, config.jwt.secret, {
-      expiresIn: config.jwt.expiresIn,
-    });
+    const jwtOptions: SignOptions = {
+      expiresIn: config.jwt.expiresIn as SignOptions['expiresIn'],
+    };
+
+    const accessToken = jwt.sign({ userId }, String(config.jwt.secret), jwtOptions);
 
     const refreshToken = uuidv4();
     const expiresAt = new Date();

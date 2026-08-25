@@ -16,7 +16,7 @@ export default function AuthCallbackPage() {
         localStorage.setItem('@taskflow:token', token);
         localStorage.setItem('@taskflow:refreshToken', refreshToken);
         localStorage.setItem('@taskflow:user', JSON.stringify(user));
-        navigate('/', { replace: true });
+        navigate('/app', { replace: true });
       } catch {
         navigate('/login', { replace: true });
       }

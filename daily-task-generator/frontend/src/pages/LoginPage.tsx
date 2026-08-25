@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, Navigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
+  const location = useLocation();
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -13,8 +14,14 @@ export default function LoginPage() {
   const { signIn, signUp, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const mode = params.get('mode');
+    setIsLogin(mode !== 'register');
+  }, [location.search]);
+
   if (isAuthenticated) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/app" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,7 +41,7 @@ export default function LoginPage() {
         await signUp(name, email, password);
         toast.success('Conta criada com sucesso!');
       }
-      navigate('/');
+      navigate('/app');
     } catch (error: any) {
       const message = error.response?.data?.error || error.message || 'Erro ao processar';
       toast.error(message);
