@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "cd daily-task-generator && npm run build",
+  "buildCommand": "npm run vercel-build",
   "outputDirectory": "frontend/dist",
-  "installCommand": " npm install",
+  "installCommand": "npm install --ignore-scripts",
   "rewrites": [
     { "source": "/(.*)",
       "destination": "/index.html" }

@@ -4,17 +4,20 @@
   "description": "Backend da aplicação Daily Task Generator",
   "author": "Jhonny Moraes <jhonnymoraes.dev@gmail.com>",
   "license": "UNLICENSED",
+  "engines": {
+    "node": "24.x"
+  },
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
+    "vercel-build": "npx prisma generate && npm run build",
     "start": "node dist/server.js",
     "test": "jest",
     "lint": "eslint src --ext .ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "tsx prisma/seed.ts",
-    "postinstall": "prisma generate"
+    "prisma:seed": "tsx prisma/seed.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -54,3 +54,5 @@ uploads/
 # Coverage
 coverage/
 **/coverage/
+.vercel
+.env*

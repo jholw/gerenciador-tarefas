@@ -13,7 +13,6 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import http from 'http';
-import path from 'path';
 import { config } from './config';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 import { socketService } from './services/socket.service';
@@ -31,6 +30,7 @@ import retrospectiveRoutes from './routes/retrospective.routes';
 
 const app = express();
 const server = http.createServer(app);
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 
 // Compression middleware (Gzip)
 app.use(compression());
@@ -107,23 +107,17 @@ app.use('/api/standups', standupRoutes);
 app.use('/api/retrospectives', retrospectiveRoutes);
 
 // Serve static files in production (frontend build)
-if (config.nodeEnv === 'production') {
-  app.use(express.static(path.join(__dirname, '../../frontend/dist')));
-  app.get('*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
-  });
-}
+// The frontend is deployed separately; this service only handles API requests.
 
 // Error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Initialize Socket.IO
-socketService.initialize(server);
+if (!isVercel) {
+  socketService.initialize(server);
 
-// Start server
-server.listen(config.port, () => {
-  logger.info(`
+  server.listen(config.port, () => {
+    logger.info(`
 ╔══════════════════════════════════════════════╗
 ║         Daily Task Generator API             ║
 ║──────────────────────────────────────────────║
@@ -133,10 +127,11 @@ server.listen(config.port, () => {
 ║  URL:    http://localhost:${config.port}              ║
 ╚══════════════════════════════════════════════╝
   `);
-});
+  });
+}
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+if (!isVercel) process.on('SIGTERM', () => {
   logger.info('SIGTERM received. Shutting down gracefully...');
   server.close(() => {
     logger.info('Server closed');
@@ -144,7 +139,7 @@ process.on('SIGTERM', () => {
   });
 });
 
-process.on('SIGINT', () => {
+if (!isVercel) process.on('SIGINT', () => {
   logger.info('SIGINT received. Shutting down gracefully...');
   server.close(() => {
     logger.info('Server closed');
